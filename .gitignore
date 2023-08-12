@@ -1,2 +1,5 @@
 best.pt
 yolov7-w6-pose.pt
+__pycache__
+.vscode
+jupyter.ipynb
