@@ -1,17 +1,9 @@
-import torch
 import numpy as np
 import cv2
 import mysql.connector
 from datetime import datetime
 from ultralytics import YOLO
 import base64
-from PIL import Image
-
-import io
-from PIL import Image
-
-# im = Image.open('test.jpg')
-# im_resize = im.resize((500, 500))
 
 
 db = mysql.connector.connect(
