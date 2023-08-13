@@ -3,3 +3,14 @@ yolov7-w6-pose.pt
 __pycache__
 .vscode
 jupyter.ipynb
+yolov8n.pt
+yolov8n-pose.pt
+yolov5s.pt
+yolov5
+runs
+labelImg
+data
+models/yolov8n.pt
+models/yolov7-w6-pose.pt
+models/test
+test.png
