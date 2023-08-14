@@ -41,16 +41,26 @@ def save_into_database(class_name, behavior, image, cursor=None, db=None):
         db.commit()
 
 
-def personDetection():
-    model_behavior = YOLO('runs/detect/train5/weights/best.pt')
-    model_pose = YOLO('./models/yolov8n-pose.pt')
+def detection(mode):
+    if mode == 'absence':
+        print('test')
+        # model_
+    elif mode == 'learn':
+        model_behavior = YOLO('runs/detect/train5/weights/best.pt')
+        model_pose = YOLO('./models/yolov8n-pose.pt')
+    elif mode == 'exam':
+        model_behavior = YOLO('runs/detect/train5/weights/best.pt')
+        model_pose = YOLO('./models/yolov8n-pose.pt')
 
     cap = cv2.VideoCapture(0)
     while cap.isOpened():
         _, frame = cap.read()
 
-        results_behavior = model_behavior(frame)
-        results_pose = model_pose(results_behavior[0].plot())
+        if mode == 'absence':
+            print('absence')
+        else:
+            results_behavior = model_behavior(frame)
+            results_pose = model_pose(results_behavior[0].plot())
 
         image = results_pose[0].plot()
 
@@ -71,4 +81,4 @@ def personDetection():
     cv2.destroyAllWindows()
 
 
-personDetection()
+# detection('learn')

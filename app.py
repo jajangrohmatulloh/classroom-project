@@ -1,5 +1,5 @@
 from tkinter import *
-from detect import personDetection
+from detect import detection
 import customtkinter as ctk
 
 ctk.set_appearance_mode('dark')
@@ -17,11 +17,14 @@ frame1.place(relx=0.5, rely=0.5, anchor=CENTER)
 label = ctk.CTkLabel(frame1, text="CTkLabel")
 label.pack()
 
-btn_absence = ctk.CTkButton(frame1, text="Absence Mode")
+btn_absence = ctk.CTkButton(
+    frame1, text="Absence Mode", command=lambda: detection('absence'))
 btn_absence.pack(padx=24, pady=16)
-btn_learn = ctk.CTkButton(frame1, text="Learn Mode", command=personDetection)
+btn_learn = ctk.CTkButton(frame1, text="Learn Mode",
+                          command=lambda: detection('learn'))
 btn_learn.pack(padx=24, pady=16)
-btn_exam = ctk.CTkButton(frame1, text="Exam Mode")
+btn_exam = ctk.CTkButton(frame1, text="Exam Mode",
+                         command=lambda: detection('exam'))
 btn_exam.pack(padx=24, pady=16)
 
 root.mainloop()
