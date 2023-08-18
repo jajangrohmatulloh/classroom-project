@@ -3,7 +3,6 @@ import cv2
 import mysql.connector
 from datetime import datetime
 from ultralytics import YOLO
-import base64
 
 db = mysql.connector.connect(
     host="localhost",
@@ -12,7 +11,7 @@ db = mysql.connector.connect(
     database="murid"
 )
 
-mycursor = db.cursor()
+cursor = db.cursor()
 
 # mycursor.execute('SELECT * FROM perilaku_murid_belajar')
 
@@ -25,7 +24,7 @@ mycursor = db.cursor()
 # print(test)
 
 
-def save_into_database(class_name, behavior, image, cursor=None, db=None):
+def save_into_database(class_name, behavior, image):
     if behavior in class_name:
         _, buffer = cv2.imencode('.png', image)
         image_blob = buffer.tobytes()
@@ -35,16 +34,16 @@ def save_into_database(class_name, behavior, image, cursor=None, db=None):
         behavior = class_name[behavior_text_index:]
         timestamp = datetime.now()
 
-        sql_query = "INSERT INTO perilaku_murid_belajar (nama, perilaku, gambar, timestamp) VALUES (%s, %s, %s, %s)"
-        mycursor.execute(sql_query, (name,
-                         behavior, image_blob, timestamp))
-        db.commit()
+        # sql_query = "INSERT INTO perilaku_murid_belajar (nama, perilaku, gambar, timestamp) VALUES (%s, %s, %s, %s)"
+        # cursor.execute(sql_query, (name,
+        #                            behavior, image_blob, timestamp))
+        # db.commit()
 
 
 def detection(mode):
     if mode == 'absence':
         print('test')
-        # model_
+        model_person = YOLO('./models/yolov8n.pt')
     elif mode == 'learn':
         model_behavior = YOLO('runs/detect/train5/weights/best.pt')
         model_pose = YOLO('./models/yolov8n-pose.pt')
@@ -57,20 +56,21 @@ def detection(mode):
         _, frame = cap.read()
 
         if mode == 'absence':
-            print('absence')
+            results_person = model_person(frame)
         else:
             results_behavior = model_behavior(frame)
             results_pose = model_pose(results_behavior[0].plot())
 
-        image = results_pose[0].plot()
+        results = results_person[0] if mode == 'absence' else results_pose[0]
+        image = results.plot()
 
         cv2.imshow('YOLO', image)
 
-        for index in results_pose[0].boxes.cls:
+        for index in results.boxes.cls:
             class_id = int(str(index.item()).split('.')[0])
-            class_name = results_pose[0].names.get(class_id)
+            class_name = results.names.get(class_id)
             save_into_database(class_name, 'person',
-                               np.squeeze(image), mycursor, db)
+                               np.squeeze(image))
 
         # print(results_behavior.pandas().xyxy[0].get('name')
 
@@ -81,4 +81,4 @@ def detection(mode):
     cv2.destroyAllWindows()
 
 
-# detection('learn')
+detection('absence')

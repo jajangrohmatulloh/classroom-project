@@ -6,15 +6,15 @@ ctk.set_appearance_mode('dark')
 ctk.set_default_color_theme('dark-blue')
 
 root = ctk.CTk()
-root.title("CustomTkinter complex_example.py")
+root.title("Real Time Detection")
 root.geometry(f"{1100}x{580}")
 
 
 frame1 = ctk.CTkFrame(root, width=1000, height=1000,
-                      corner_radius=8, fg_color='RED')
+                      corner_radius=8, fg_color='#2A2A2A')
 frame1.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-label = ctk.CTkLabel(frame1, text="CTkLabel")
+label = ctk.CTkLabel(frame1, text="Select Mode")
 label.pack()
 
 btn_absence = ctk.CTkButton(
