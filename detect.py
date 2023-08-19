@@ -46,31 +46,39 @@ def save_into_database(class_name, behavior, image, mode):
             home_time = datetime(2007, 7, 7, 17, 0, 0).strftime('%H:%M:%S')
 
             # Waktu Masuk
-            if now > midday:
+            if now < midday:
                 punctuality = 'Terlambat' if now > school_hours else 'Tepat Waktu'
 
                 sql_query_insert = "INSERT INTO kehadiran_murid (`nama`, `kategori waktu datang`, `waktu datang`, `gambar datang`) VALUES (%s, %s, %s, %s)"
                 sql_query_bind = (class_name, punctuality, timestamp, image_blob)
-                sql_query_select = "SELECT nama FROM kehadiran_murid WHERE nama='{}' AND 'waktu datang' BETWEEN '{}' AND '{}'".format(class_name, timestamp.date(), timestamp.date() + timedelta(days=1))
+                sql_query_select = "SELECT nama FROM kehadiran_murid WHERE nama = '%s' AND `waktu datang` BETWEEN '%s' AND '%s' LIMIT 1" %(class_name, timestamp.date(), timestamp.date() + timedelta(days=1))
 
             # Waktu Pulang
             else: 
                 punctuality = 'Pulang Duluan' if now < home_time else 'Pulang Pada Waktunya'
 
-                sql_query_insert = "UPDATE kehadiran_murid SET waktu pulang='%s', 'kategori waktu pulang'='%s', 'gambar pulang'='%s'"
-                sql_query_bind = (timestamp, punctuality, image_blob)
-                sql_query_select = "SELECT nama FROM kehadiran_murid WHERE nama='{}' AND 'waktu pulang' BETWEEN '{}' AND '{}'".format(class_name, timestamp.date(), timestamp.date() + timedelta(days=1))
+                sql_query_insert = "UPDATE kehadiran_murid SET `waktu pulang` = %s, `kategori waktu pulang` = %s, `gambar pulang` = %s WHERE `nama` = %s AND `waktu datang` BETWEEN %s AND %s"
+                sql_query_bind = (timestamp, punctuality, image_blob, class_name, timestamp.date(), timestamp.date() + timedelta(days=1))
+                sql_query_select = "SELECT nama, `kategori waktu pulang` FROM kehadiran_murid WHERE `nama` = '%s' AND `waktu pulang` BETWEEN '%s' AND '%s' LIMIT 1" %(class_name, timestamp.date(), timestamp.date() + timedelta(days=1))
         
         cursor.execute("START TRANSACTION")
+        # Get Today Timestamp | Get Last Timestamp(Is More 30s?)
         cursor.execute(sql_query_select)
         result = cursor.fetchone()
-        if result != None:
+        print(result)
+        if result == None:
+            # if mode == 'attendance' and now > midday:
+            #     return
+            cursor.execute(sql_query_insert, sql_query_bind)
+        else:
             if mode != 'attendance':
                 is_more_30s = (datetime.now() - result[0]).total_seconds() > 30
                 if is_more_30s:
                     cursor.execute(sql_query_insert, sql_query_bind)
-        else:
-            cursor.execute(sql_query_insert, sql_query_bind)
+            else:
+                if mode != 'attendance':
+                    cursor.execute(sql_query_insert, sql_query_bind)
+        # cursor.execute(sql_query_insert, sql_query_bind)
         db.commit()
 
 
@@ -95,7 +103,7 @@ def detection(mode):
         results = results_behavior[0] if mode != 'attendance' else results_person[0]
         image = results_pose[0].plot() if mode != 'attendance' else results_person[0].plot()
 
-        cv2.imshow('YOLO', image)
+        cv2.imshow(mode.capitalize() + ' Mode', image)
 
         for index in results.boxes.cls:
             class_id = int(str(index.item()).split('.')[0])
