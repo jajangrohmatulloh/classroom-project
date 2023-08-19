@@ -18,7 +18,7 @@ label = ctk.CTkLabel(frame1, text="Select Mode")
 label.pack()
 
 btn_absence = ctk.CTkButton(
-    frame1, text="Absence Mode", command=lambda: detection('absence'))
+    frame1, text="Absence Mode", command=lambda: detection('attendance'))
 btn_absence.pack(padx=24, pady=16)
 btn_learn = ctk.CTkButton(frame1, text="Learn Mode",
                           command=lambda: detection('learn'))
