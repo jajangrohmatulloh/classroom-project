@@ -1,4 +1,3 @@
-from tkinter import *
 from detect import detection
 import customtkinter as ctk
 
@@ -12,14 +11,14 @@ root.geometry(f"{1100}x{580}")
 
 frame1 = ctk.CTkFrame(root, width=1000, height=1000,
                       corner_radius=8, fg_color='#2A2A2A')
-frame1.place(relx=0.5, rely=0.5, anchor=CENTER)
+frame1.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
 
 label = ctk.CTkLabel(frame1, text="Select Mode")
 label.pack()
 
-btn_absence = ctk.CTkButton(
-    frame1, text="Absence Mode", command=lambda: detection('attendance'))
-btn_absence.pack(padx=24, pady=16)
+btn_attendance = ctk.CTkButton(
+    frame1, text="Attendance Mode", command=lambda: detection('attendance'))
+btn_attendance.pack(padx=24, pady=16)
 btn_learn = ctk.CTkButton(frame1, text="Learn Mode",
                           command=lambda: detection('learn'))
 btn_learn.pack(padx=24, pady=16)
