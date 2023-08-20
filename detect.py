@@ -46,7 +46,7 @@ def save_into_database(class_name, behavior, image, mode):
             home_time = datetime(2007, 7, 7, 17, 0, 0).strftime('%H:%M:%S')
 
             # Waktu Masuk
-            if now > midday:
+            if now < midday:
                 punctuality = 'Terlambat' if now > school_hours else 'Tepat Waktu'
 
                 sql_query_insert = "INSERT INTO kehadiran_murid (`nama`, `kategori waktu datang`, `waktu datang`, `gambar datang`) VALUES (%s, %s, %s, %s)"
@@ -59,7 +59,7 @@ def save_into_database(class_name, behavior, image, mode):
 
                 sql_query_update = "UPDATE kehadiran_murid SET `waktu pulang` = %s, `kategori waktu pulang` = %s, `gambar pulang` = %s WHERE `nama` = %s AND `waktu datang` BETWEEN %s AND %s"
                 sql_query_bind = (timestamp, punctuality, image_blob, class_name, timestamp.date(), timestamp.date() + timedelta(days=1))
-                sql_query_select = "SELECT nama, `kategori waktu datang`, `kategori waktu pulang` FROM kehadiran_murid WHERE `nama` = '%s' AND `waktu datang` BETWEEN '%s' AND '%s' LIMIT 1" %(class_name, timestamp.date(), timestamp.date() + timedelta(days=1))
+                sql_query_select = "SELECT nama, `kategori waktu pulang` FROM kehadiran_murid WHERE `nama` = '%s' AND (`waktu datang` BETWEEN '%s' AND '%s' OR `waktu pulang` BETWEEN '%s' AND '%s') LIMIT 1" %(class_name, timestamp.date(), timestamp.date() + timedelta(days=1), timestamp.date(), timestamp.date() + timedelta(days=1))
         
         cursor.execute("START TRANSACTION")
         # Get Today Timestamp | Get Last Timestamp(Is More 30s?)
@@ -67,7 +67,7 @@ def save_into_database(class_name, behavior, image, mode):
         result = cursor.fetchone()
         print(result)
         if result == None:
-            if mode =='attendance' and now < midday:
+            if mode =='attendance' and now > midday:
                 sql_query_insert = "INSERT INTO kehadiran_murid (`nama`, `kategori waktu pulang`, `waktu pulang`, `gambar pulang`) VALUES (%s, %s, %s, %s)"
                 sql_query_bind = (class_name, punctuality, timestamp, image_blob)
             cursor.execute(sql_query_insert, sql_query_bind)
@@ -79,10 +79,10 @@ def save_into_database(class_name, behavior, image, mode):
             else:
                 if mode != 'attendance':
                     cursor.execute(sql_query_insert, sql_query_bind)
-                if result[1] == None:
+                elif now > midday and result[1] == None:
+                    print('testupdate')
                     cursor.execute(sql_query_update, sql_query_bind)
 
-        # cursor.execute(sql_query_insert, sql_query_bind)
         db.commit()
 
 
@@ -140,6 +140,3 @@ def detection(mode):
 
     cap.release()
     cv2.destroyAllWindows()
-
-
-detection('attendance')
