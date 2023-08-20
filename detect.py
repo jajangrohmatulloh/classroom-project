@@ -82,13 +82,14 @@ def save_into_database(class_name, behavior, image, mode):
         db.commit()
 
 
+
 def detection(mode):
     if mode != 'attendance':
         model = './models/learn.pt' if mode == 'learn' else './models/exam.pt'
         model_behavior = YOLO(model)
-        model_pose = YOLO('./models/yolov8n-pose.pt')
     else:
         model_person = YOLO('./models/person.pt')
+    model_pose = YOLO('./models/yolov8n-pose.pt')
 
     cap = cv2.VideoCapture(0)
     while cap.isOpened():
@@ -96,12 +97,12 @@ def detection(mode):
 
         if mode != 'attendance':
             results_behavior = model_behavior(frame)
-            results_pose = model_pose(results_behavior[0].plot())
         else:
             results_person = model_person(frame)
 
         results = results_behavior[0] if mode != 'attendance' else results_person[0]
-        image = results_pose[0].plot() if mode != 'attendance' else results_person[0].plot()
+        results_pose = model_pose(results.plot())
+        image = results_pose[0].plot()
 
         cv2.imshow(mode.capitalize() + ' Mode', image)
 
@@ -136,4 +137,4 @@ def detection(mode):
     cv2.destroyAllWindows()
 
 
-detection('attendance')
+# detection('attendance')
